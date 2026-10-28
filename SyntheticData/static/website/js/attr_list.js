@@ -1,0 +1,1 @@
+var attr_list = ["Address", "Banking", "City", "Company", "Country", "County", "Credit_Card", "Currency", "Date", "Email", "Job", "Multiple_Choice", "NINO", "Name", "Number", "Number_Plate", "Password", "Phone_Number", "String", "Text", "Title", "Website", "Id"];

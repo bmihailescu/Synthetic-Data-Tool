@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!------ PAGE HEADING (HIDDEN UNTIL OBJECT SELECTED) ------>
+<div id="sf-heading" class="container mt-5 d-none">
+    <h1 class="mb-4 text-center">Generate Object Data - <span id="sf-object-heading">Account</span></h1>
+</div>
+
+<!------ LANDING INTRODUCTION ------>
+<section id="sf-intro" class="container sf-intro text-center" aria-labelledby="sf-intro-heading">
+    <h1 id="sf-intro-heading">Generate Salesforce Data</h1>
+    <p id="sf-intro-description" class="mb-2">
+        Use the dropdown below to choose the kind of Salesforce records you want to create. You can then select the fields and number of records to generate.
+    </p>
+</section>
+
+<!------ OBJECT SELECTOR ------>
+<div id="sf-dropdown-container" class="container mb-4 sf-dropdown-initial">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="dropdown w-100 sf-object-select">
+                <button class="btn btn-light sf-object-toggle w-100 d-flex justify-content-between align-items-center" type="button" id="sfObjectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-describedby="sf-intro-description">
+                    <span id="sf-object-label">Select Object</span>
+                    <span class="sf-object-caret" aria-hidden="true">&#9662;</span>
+                </button>
+                <div class="dropdown-menu sf-object-menu w-100" aria-labelledby="sfObjectDropdown">
+                    <button class="dropdown-item" type="button" disabled>Select Object</button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item sf-object-item" type="button" data-object="Account - Business">
+                        <span class="sf-object-item-title">Account - Business</span>
+                        <span class="sf-object-item-description">A company or organisation, with business details such as its name, industry, and address.</span>
+                    </button>
+                    <button class="dropdown-item sf-object-item" type="button" data-object="Account - Person">
+                        <span class="sf-object-item-title">Account - Person</span>
+                        <span class="sf-object-item-description">An individual customer stored as an account, with personal contact details.</span>
+                    </button>
+                    <button class="dropdown-item sf-object-item" type="button" data-object="Contact">
+                        <span class="sf-object-item-title">Contact</span>
+                        <span class="sf-object-item-description">A person associated with an account, such as a customer or business contact.</span>
+                    </button>
+                    <button class="dropdown-item sf-object-item" type="button" data-object="Lead">
+                        <span class="sf-object-item-title">Lead</span>
+                        <span class="sf-object-item-description">A potential customer who has not yet been qualified as an opportunity or account.</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="sf-main-content" class="d-none">
+    <!------ ENTRY FORM ------>
+    <form class="container sf-form-container needs-validation" id="myForm" name="myForm" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="sf_object" id="sf-object-input" value="Account">
+        <!-- Mode selection, parent account & active flag -->
+        <div id="sf-options-row" class="row align-items-start text-center sf-options-row">
+            <!-- Mandatory Only -->
+            <div class="col-md-3 sf-option">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mode" id="mandatory" value="mandatory" checked>
+                    <label class="form-check-label" for="mandatory">Mandatory Fields Only</label>
+                    <a class="small text-muted d-block mt-1" data-toggle="collapse" href="#mandatoryFieldsList" role="button" aria-expanded="false" aria-controls="mandatoryFieldsList">
+                        View fields
+                    </a>
+                    <div class="collapse mt-1 text-left" id="mandatoryFieldsList">
+                        <ul id="mandatoryFieldsListBody" class="mb-0 pl-3 small">
+                            {% for field in mandatory_fields_preview %}
+                                <li>{{ field }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- All Standard / Contact Person -->
+            <div class="col-md-3 sf-option" id="sf-all-standard-col">
+                <!-- Generic All Standard Fields (non-Contact objects) -->
+                <div class="form-check" id="sf-all-standard-wrapper">
+                    <input class="form-check-input" type="radio" name="mode" id="all_fields" value="all_fields">
+                    <label class="form-check-label" id="sf-all-fields-label" for="all_fields">All Standard Fields</label>
+                    <a id="sf-all-fields-toggle" class="small text-muted d-block mt-1" data-toggle="collapse" href="#allFieldsList" role="button" aria-expanded="false" aria-controls="allFieldsList">
+                        View fields
+                    </a>
+                    <div class="collapse mt-1 text-left" id="allFieldsList">
+                        <ul id="allFieldsListBody" class="mb-0 pl-3 small">
+                            {% for field in all_fields_preview %}
+                                <li>{{ field }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <!-- Contact: All Standard Fields - Person (shown only when Contact is selected) -->
+                <div class="form-check d-none text-left" id="sf-contact-person-wrapper">
+                    <input class="form-check-input" type="radio" name="contact_all_type" id="contact_all_person" value="person">
+                    <label class="form-check-label" for="contact_all_person">All Standard Fields - Person</label>
+                    <a class="small text-muted d-block mt-1" data-toggle="collapse" href="#contactPersonFieldsList" role="button" aria-expanded="false" aria-controls="contactPersonFieldsList">
+                        View fields
+                    </a>
+                    <div class="collapse mt-1 text-left" id="contactPersonFieldsList">
+                        <ul id="contactPersonFieldsListBody" class="mb-0 pl-3 small"></ul>
+                    </div>
+                </div>
+                <!-- Parent Account appears under Person when business is active (Contact only) -->
+                <div id="sf-parent-wrapper" class="mt-2 d-none text-left">
+                    <input type="text" class="form-control sf-parent-input" name="contact_parent_account" placeholder="Parent Account (Optional)"></input>
+                </div>
+            </div>
+            <!-- Contact: All Standard Fields - Business (Contact only) -->
+            <div class="col-md-3 sf-option d-none" id="sf-contact-business-col">
+                <div class="form-check text-left">
+                    <input class="form-check-input" type="radio" name="contact_all_type" id="contact_all_business" value="business">
+                    <label class="form-check-label" for="contact_all_business">All Standard Fields - Business</label>
+                    <a class="small text-muted d-block mt-1" data-toggle="collapse" href="#contactBusinessFieldsList" role="button" aria-expanded="false" aria-controls="contactBusinessFieldsList">
+                        View fields
+                    </a>
+                    <div class="collapse mt-1 text-left" id="contactBusinessFieldsList">
+                        <ul id="contactBusinessFieldsListBody" class="mb-0 pl-3 small"></ul>
+                    </div>
+                </div>
+                <!-- Active appears under Business when business is active (Contact only) -->
+                <div id="sf-active-wrapper" class="form-check mt-2 d-none">
+                    <input class="form-check-input" type="checkbox" name="contact_active" id="contact_active">
+                    <label class="form-check-label" for="contact_active">Active</label>
+                </div>
+            </div>
+            <!-- Contact: All Standard Fields - Both (Contact only) -->
+            <div class="col-md-3 sf-option d-none" id="sf-contact-both-col">
+                <div class="form-check text-left">
+                    <input class="form-check-input" type="radio" name="contact_all_type" id="contact_all_both" value="both">
+                    <label class="form-check-label" for="contact_all_both">All Standard Fields - Both</label>
+                    <a class="small text-muted d-block mt-1" data-toggle="collapse" href="#contactBothFieldsList" role="button" aria-expanded="false" aria-controls="contactBothFieldsList">
+                        View fields
+                    </a>
+                    <div class="collapse mt-1 text-left" id="contactBothFieldsList">
+                        <ul id="contactBothFieldsListBody" class="mb-0 pl-3 small"></ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Parent Account + Active flag (business accounts only) -->
+            <div id="sf-parent-active" class="col-md-6 sf-option d-flex align-items-center justify-content-center justify-content-md-end d-none">
+                <input type="text" class="form-control sf-parent-input" name="parent_account" placeholder="Parent Account (Optional)"></input>
+                <div class="form-check mb-0 ml-2">
+                    <input class="form-check-input" type="checkbox" name="active" id="active">
+                    <label class="form-check-label" for="active">Active</label>
+                </div>
+            </div>
+        </div>
+        <!-- Custom Fields Section -->
+        <div class="sf-custom-wrapper">
+            <!-- Column Names -->
+            <div class="row justify-content-center">
+            <div class="col-10 sf-custom-panel">
+                    <p class="mb-3 text-muted"><strong>Custom Fields (Optional)</strong></p>
+                    <div class="d-flex row-hl">
+                        <button type="button" class="btn btn-sm btn-secondary invisible m-1">-</button>
+                        <div class="col-3">Field Label</div>
+                        <div class="col-3">Data Type</div>
+                        <div class="col-5 px-0">Format</div>
+                    </div>
+                    <!-- Rows -->
+                    <div id="custom_fields_container"></div>
+                    <!-- Plus button -->
+                    <div class="d-flex row-hl" id="custom_add_section">
+                        <button type="button" title="CLICK TO ADD DATA FIELDS" class="btn btn-sm btn-secondary m-1" id="custom_add_button">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="row justify-content-center sf-submit-row">
+            <input type="number" class="form-control col-2" placeholder="No. of Records" name="num_of_entries"
+                id="num_of_entries" min="1" required>
+            <button id="submit" type="submit" class="btn btn-salesforce">Submit</button>
+        </div>
+
+        </form>
+</div>
+<script>
+    // Parse Django-provided JSON string into a JS object
+    window.sfFieldPreviews = JSON.parse('{{ field_previews|escapejs }}');
+</script>
+<script src="{% static 'website/js/attr_list.js' %}"></script>
+<script src="{% static 'website/js/widgets.js' %}"></script>
+<script src="{% static 'website/js/submit.js' %}"></script>
+<script src="{% static 'website/js/salesforce.js' %}?v=contact-parent-fix"></script>
+
+<!--BOTTOM HALF-->
+<div class="container mt-5 mb-5">
+
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+pyinstaller --onefile -w run.py
+
+
