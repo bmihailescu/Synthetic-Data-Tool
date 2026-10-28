@@ -1,0 +1,53 @@
+clone:
+  depth: full
+
+definitions:
+  steps:
+    - step: &Build-docker-image
+        name: Build Docker image
+        image: python:3.8
+        script:
+          - VERSION=$(./.pipelineScripts/getVersion.sh) && echo $VERSION
+          - docker build -t synthetic-data-tool/synthetic-data-tool-app:${VERSION} -t synthetic-data-tool/synthetic-data-tool-app .
+          - pipe: atlassian/aws-ecr-push-image:1.2.2
+            variables:
+              IMAGE_NAME: synthetic-data-tool/synthetic-data-tool-app
+              TAGS: '${VERSION} latest'
+        services:
+          - docker
+
+pipelines:
+  default:
+    - step: *Build-docker-image
+    - step:
+        name: Deploy to FEATURE
+        image: jshimko/kube-tools-aws:3.5.0
+        script:
+          - ./.pipelineScripts/deployToEnv.sh feature
+  branches:
+    master:
+      - parallel:
+        - step:
+            name: Tagging repo
+            image: atlassian/default-image:2
+            script:
+              - VERSION=$(cat ./VERSION) && echo $VERSION
+              - git remote set-url origin ${BITBUCKET_GIT_SSH_ORIGIN}
+              - git tag $VERSION ${BITBUCKET_COMMIT}
+              - git push origin --tags
+        - step:
+            name: Bumping patch version
+            image: atlassian/default-image:2
+            script:
+              - ./.pipelineScripts/versionBumpPatch.sh
+              - VERSION=$(cat ./VERSION) && echo $VERSION
+              - git remote set-url origin ${BITBUCKET_GIT_SSH_ORIGIN}
+              - git add VERSION
+              - git commit --no-verify -m "[skip ci] Bumping patch version"
+              - git push
+        - step: *Build-docker-image
+      - step:
+          name: Deploy to DEMO
+          image: jshimko/kube-tools-aws:3.5.0
+          script:
+            - ./.pipelineScripts/deployToEnv.sh demo

@@ -1,0 +1,5 @@
+global:
+  namespace: synthetic-data-tool-demo
+
+app:
+  url: synthetic-data-tool.dseuk.io

@@ -1,0 +1,6 @@
+global:
+  namespace: synthetic-data-tool-prod
+
+app:
+  url: synthetic-data-tool.dseuk.io
+  image_tag: ${IMAGE_TAG}

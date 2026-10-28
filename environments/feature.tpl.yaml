@@ -1,0 +1,6 @@
+global:
+  namespace: synthetic-data-tool-feature
+
+app:
+  url: synthetic-data-tool-${GITHUB_SHORT_SHA}.dseuk.io
+  image_tag: ${IMAGE_TAG}

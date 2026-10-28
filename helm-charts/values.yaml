@@ -1,0 +1,21 @@
+global:
+  namespace: synthetic-data-tool
+  costcentre: QTE
+  schedule: businesshours
+  image:
+    imageRepository: 934133810841.dkr.ecr.eu-west-1.amazonaws.com/synthetic-data-tool
+    pullPolicy: IfNotPresent
+
+app:
+  name: synthetic-data-tool
+  replicas: 1
+  containerPort: 8000
+  healthCheck: false
+  url: synthetic-data-tool.dseuk.io
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 50m
+      memory: 1Gi

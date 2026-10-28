@@ -1,0 +1,13 @@
+{{- define "syntheticDataTool.library.affinity" -}}
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+            - key: deployment
+              operator: In
+              values:
+                - {{ .Chart.Name }}
+        topologyKey: "kubernetes.io/hostname"
+{{- end -}}

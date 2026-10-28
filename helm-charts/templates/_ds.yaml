@@ -1,0 +1,6 @@
+{{- define "syntheticDataTool.library.deploymentStrategy" -}}
+type: RollingUpdate
+rollingUpdate:
+  maxSurge: 100%
+  maxUnavailable: 25%
+{{- end -}}

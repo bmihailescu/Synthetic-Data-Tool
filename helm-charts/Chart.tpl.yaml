@@ -1,0 +1,5 @@
+name: synthetic-data-tool-${SAFE_BRANCH}
+version: ${VERSION}
+appVersion: ${IMAGE_TAG}
+apiVersion: v2
+type: application
