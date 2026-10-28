@@ -1,0 +1,1 @@
+var attr_list = ["Id", "Address", "Date", "Email", "Job", "Multiple_Choice", "Name", "Number", "String", "Text"];

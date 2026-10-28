@@ -1,0 +1,127 @@
+/* Salesforce Page Styling */
+.bg-salesforce {
+    background-color: #00A1E0 !important;
+}
+
+.btn-salesforce {
+    background-color: #00A1E0 !important;
+    border-color: #00A1E0 !important;
+    color: white !important;
+}
+
+.btn-salesforce:hover {
+    background-color: #0089C2 !important;
+    border-color: #0089C2 !important;
+}
+
+.btn-salesforce:focus,
+.btn-salesforce:active {
+    background-color: #0070A0 !important;
+    border-color: #0070A0 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 161, 224, 0.5) !important;
+}
+
+/* Salesforce object dropdown */
+.sf-object-select {
+    margin-bottom: 0.5rem;
+}
+
+.sf-object-toggle {
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: #495057;
+    background-color: #ffffff;
+}
+
+.sf-object-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 161, 224, 0.25);
+}
+
+.sf-object-caret {
+    font-size: 0.8rem;
+}
+
+.sf-object-menu {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.sf-object-item {
+    font-weight: 400;
+}
+
+.sf-object-item:hover,
+.sf-object-item:focus {
+    background-color: #00A1E0;
+    color: #ffffff;
+}
+
+/* Salesforce form layout */
+.sf-form-container {
+    max-width: 960px;
+    margin-top: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.sf-options-row {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.sf-option {
+    margin-bottom: 0.5rem;
+}
+
+.sf-custom-wrapper {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.sf-submit-row {
+    margin-top: 2.5rem;
+}
+
+#num_of_entries {
+    max-width: 220px;
+    margin-right: 1rem;
+}
+
+.sf-parent-input {
+    min-width: 260px;
+    max-width: 320px;
+    margin-right: 1rem;
+}
+
+/* Ensure business Parent/Active column is hidden for non-business objects
+   even if JS state gets out of sync. */
+body.sf-contact-object #sf-parent-active,
+body.sf-lead-object #sf-parent-active,
+body.sf-person-account-object #sf-parent-active {
+    display: none !important;
+}
+
+/* Contact-specific parent/active should only appear when explicitly shown
+   via JS; default to hidden to avoid flashes/ghosts. */
+#sf-parent-wrapper,
+#sf-active-wrapper {
+    display: none;
+}
+
+/* Salesforce custom fields panel */
+.sf-custom-panel {
+    border: 1px solid #e0ecf5; /* faint grey/blue */
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem 1rem;
+    background-color: #ffffff;
+}
+
+.sf-custom-panel > p {
+    margin-top: 0;
+}
+
+/* Extra top spacing for the Salesforce dropdown before an object is selected */
+.sf-dropdown-initial {
+    margin-top: 3rem;
+}
