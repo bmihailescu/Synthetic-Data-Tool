@@ -1,11 +1,15 @@
 import json
 import io
+import re
 import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
 from zipfile import ZipFile
 
 from django.test import TestCase
+from faker import Faker
+
+from .SyntheticApp import Data_Types, UK_CITY_POSTCODES
 
 
 class V6BikeGenerationTests(TestCase):
@@ -149,5 +153,40 @@ class V6BikeGenerationTests(TestCase):
 		)
 
 		self.assertEqual(response.status_code, 400)
+
+
+class UKCityPostcodeGenerationTests(TestCase):
+	def test_city_and_address_postcodes_use_real_catalogued_pairs(self):
+		generator = Data_Types(Faker("en_GB"))
+		fake = Faker("en_GB")
+		known_pairs = {
+			(location["city"], location["postcode"])
+			for location in UK_CITY_POSTCODES
+		}
+
+		for _ in range(50):
+			generator._clear_caches()
+			city = generator.City(fake)
+			postcode = generator.Address(fake, "postcode")
+			full_address = generator.Address(fake, "fullAddress")
+
+			self.assertIn((city, postcode), known_pairs)
+			self.assertIn(city, full_address)
+			self.assertIn(postcode, full_address)
+
+	def test_country_is_always_united_kingdom(self):
+		generator = Data_Types(Faker("en_GB"))
+
+		for _ in range(20):
+			self.assertEqual(generator.Country(Faker("en_GB")), "United Kingdom")
+
+	def test_phone_number_formats_are_uk_mobile_numbers(self):
+		generator = Data_Types(Faker("en_GB"))
+		fake = Faker("en_GB")
+
+		for phone_format in ("Phone Number", "Mobile Number"):
+			for _ in range(20):
+				number = generator.Phone_Number(fake, phone_format)
+				self.assertRegex(number, re.compile(r"^\+44 7700 900\d{3}$"))
 
 # Create your tests here.

@@ -33,6 +33,8 @@ In the command terminal:
 
 On the home page, save a completed manual schema by entering a name and selecting **Save**. Saved schemas are stored in the current browser for this site, can be selected to preview their columns and load them back into the editor, and can be removed with **Delete**. They are not shared across browsers or app instances.
 
+For manually generated data, City and Address values use an offline curated list of 45 UK city and postcode pairs. The postcodes were checked against the Postcodes.io postcode directory; the list is intentionally limited, and City and postcode values remain paired when generated on the same row. The street line remains synthetic and is not verified to be assigned within that postcode. Country always returns `United Kingdom`. Phone Number and Mobile Number use Ofcom's reserved UK fictional mobile range (`+44 7700 900xxx`), so generated numbers are UK mobile-formatted but not live subscriber numbers.
+
 ## 1.4 Stopping the application
 
 To stop running the application, press Ctrl+C in the command prompt
