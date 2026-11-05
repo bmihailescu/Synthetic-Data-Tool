@@ -1,7 +1,12 @@
 from django.shortcuts import render, HttpResponse
+from io import BytesIO
 import json
+import re
+from zipfile import ZIP_DEFLATED, ZipFile
 from .SyntheticApp import Data_Types
 from .SyntheticApp import generate_data
+from .aviva_integration import generate_aviva_files
+from .v6_bike_schema import generate_v6_bike_records
 from faker import Faker
 import inspect
 
@@ -27,6 +32,57 @@ def home(request):
     var = {'node': 'yes'}
     
     if request.method == "POST":    # Submit Synthetic dataset request
+        if request.POST.get("schema_mode", "manual") == "aviva_integration":
+            try:
+                files_per_type = int(request.POST["num_of_entries"])
+                aviva_files = generate_aviva_files(files_per_type)
+            except (KeyError, TypeError, ValueError) as error:
+                return HttpResponse(str(error), status=400)
+
+            archive_buffer = BytesIO()
+            with ZipFile(archive_buffer, "w", compression=ZIP_DEFLATED) as archive:
+                for filename, payload in aviva_files:
+                    archive.writestr(filename, payload)
+
+            response = HttpResponse(archive_buffer.getvalue(), content_type="application/zip")
+            response["Content-Disposition"] = 'attachment; filename="Aviva.IntegrationTests.zip"'
+            return response
+
+        if request.POST.get("schema_mode", "manual") == "v6_bike":
+            try:
+                num_of_entries = int(request.POST["num_of_entries"])
+                records = generate_v6_bike_records(num_of_entries)
+            except (KeyError, TypeError, ValueError) as error:
+                return HttpResponse(str(error), status=400)
+
+            if request.POST.get("json_multiple_entries", "yes").lower() == "no":
+                archive_buffer = BytesIO()
+                with ZipFile(archive_buffer, "w", compression=ZIP_DEFLATED) as archive:
+                    for index, record in enumerate(records, start=1):
+                        risk_data = json.loads(record["RiskData"])
+                        vehicles = risk_data.get("Vehicles", [])
+                        vehicle = vehicles[0] if vehicles else {}
+                        bike_name = "_".join(
+                            value for value in (vehicle.get("Make"), vehicle.get("Model")) if value
+                        )
+                        safe_name = re.sub(r"[^A-Za-z0-9_-]+", "_", bike_name).strip("_")
+                        filename = f"SyntheticV6Bike_{index:04d}_{safe_name or 'Client'}.json"
+                        archive.writestr(
+                            filename,
+                            json.dumps(record, ensure_ascii=False, indent=2),
+                        )
+
+                response = HttpResponse(archive_buffer.getvalue(), content_type="application/zip")
+                response["Content-Disposition"] = 'attachment; filename="SyntheticV6Bike.zip"'
+                return response
+
+            response = HttpResponse(
+                json.dumps(records, ensure_ascii=False, indent=2),
+                content_type="application/json",
+            )
+            response["Content-Disposition"] = 'attachment; filename="SyntheticV6Bike.json"'
+            return response
+
         # Converting Data into list arguments
         column_name_array = request.POST.getlist("column_name")
         data_type_array = [w.replace(' ', '_') for w in request.POST.getlist('data_type')]

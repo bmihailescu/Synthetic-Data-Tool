@@ -37,6 +37,7 @@ function progressBar() {
     const num_of_cells = num_of_columns * num_of_entries
 
     const progress_bar = document.querySelector("#progress_bar")
+    if (!progress_bar) return
     width=0
 
 

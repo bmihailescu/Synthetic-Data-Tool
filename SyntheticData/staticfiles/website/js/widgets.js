@@ -57,6 +57,7 @@ function newRow() {
 
     ////Data Type List//////
     function dropdownValue(e){
+        e.preventDefault()
         this.parentElement.parentElement.firstChild.text = this.text
         this.parentElement.parentElement.firstChild.nextElementSibling.value = this.text
     }
@@ -65,6 +66,7 @@ function newRow() {
         const a = document.createElement("a")
         a.className="dropdown-item"
         a.href="#/"
+        a.dataset.dataType = attr
         a.innerHTML=attr.replace("_"," ")
         
         a.addEventListener('click',dropdownValue);
@@ -128,7 +130,7 @@ function newRow() {
                 // Ensure only integers are parsed
                 const minInput = currentRowFormat.querySelectorAll('input[type="number"]')[0];
                 const maxInput = currentRowFormat.querySelectorAll('input[type="number"]')[1];
-                const hiddenFormat = currentRowFormat.querySelectorAll('#numberFormat')
+                const hiddenFormat = currentRowFormat.querySelector('#numberFormat');
 
                 [minInput, maxInput].forEach(input => {
                     input.addEventListener('input', () => {
@@ -201,7 +203,7 @@ function newRow() {
     // Placeholder Div - Format Column
     const placeholderDiv = document.createElement("div")
     placeholderDiv.id = "placeholderDiv"
-    placeholderDiv.className = "col-5 px-0"
+    placeholderDiv.className = "col-4 px-0"
 
     //Blank Values
     const blankDiv = document.createElement("div")
@@ -221,7 +223,7 @@ function newRow() {
 
     // Bad Data Slider
     const badDataDiv = document.createElement("div")
-    badDataDiv.className = "px-3"
+    badDataDiv.className = "col-3 px-3"
     badDataDiv.innerHTML = '<input class="custom-range mt-2" type="range" min="0" max="4" step="1" value="0" name="badData"></input>' 
     
 
@@ -232,9 +234,9 @@ function newRow() {
     div.appendChild(blankDiv)
     div.appendChild(badDataDiv)
 
-    //put div.row into div.container
     const add = document.querySelector("#add");
-    document.querySelector("form.container").insertBefore(div,add);
+    add.parentNode.insertBefore(div, add);
+    return div;
 }
 
 // Initialize home page functionality if elements exist
@@ -465,7 +467,7 @@ function newSalesforceRow() {
     // Placeholder Div - Format Column
     const placeholderDiv = document.createElement("div")
     placeholderDiv.id = "placeholderDiv"
-    placeholderDiv.className = "col-4 px-0"
+    placeholderDiv.className = "col-5 px-0"
 
     //Put input and drop down into div row
     div.appendChild(input)

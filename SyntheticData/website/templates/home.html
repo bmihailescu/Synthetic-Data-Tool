@@ -11,6 +11,67 @@
     <!------ ENTRY FORM ------>
     <form class="container needs-validation" id="myForm" name="myForm" action="" method="POST">
       {% csrf_token %}
+        <div class="row justify-content-center mb-4">
+          <div class="col-md-4">
+            <label for="schema_mode">Schema</label>
+            <select class="custom-select" id="schema_mode" name="schema_category">
+              <option value="manual">Manually defined schema</option>
+              <option value="data_analytics">Data and Analytics</option>
+              <option value="api_tests">API Tests</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row justify-content-center mb-4" data-data-analytics-schema hidden>
+          <div class="col-md-4">
+            <label for="v6_schema_mode">Data and Analytics option</label>
+            <select class="custom-select" id="v6_schema_mode" name="schema_mode" disabled>
+              <option value="v6_bike">V6 bike</option>
+            </select>
+          </div>
+        </div>
+        <div class="row justify-content-center mb-4" data-api-tests-schema hidden>
+          <div class="col-md-4">
+            <label for="aviva_schema_mode">API Tests option</label>
+            <select class="custom-select" id="aviva_schema_mode" name="schema_mode" disabled>
+              <option value="aviva_integration">Aviva.IntegrationTests</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="v6-json-only" class="text-center text-muted" hidden>V6 bike downloads are generated as JSON.</p>
+        <div class="row justify-content-center mb-4" data-v6-only hidden>
+          <div class="col-md-4">
+            <label for="json_multiple_entries">JSON with multiple entries</label>
+            <select class="custom-select" id="json_multiple_entries" name="json_multiple_entries">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <small class="form-text text-muted">No downloads a ZIP containing one JSON file per client.</small>
+          </div>
+        </div>
+        <p class="text-center text-muted" data-aviva-only hidden>Each file type is generated the requested number of times in one ZIP archive.</p>
+
+        <div id="manual-schema-fields" data-manual-schema>
+        <div class="row justify-content-center mb-4">
+          <div class="col-md-8">
+            <label for="saved-schema-select">Saved schemas</label>
+            <select class="custom-select" id="saved-schema-select">
+              <option value="">Select a saved schema</option>
+            </select>
+            <div class="mt-3">
+              <label for="saved-schema-name">Save current schema</label>
+              <div class="d-flex">
+                <input class="form-control mr-2" id="saved-schema-name" type="text" maxlength="100" placeholder="Schema name">
+                <button class="btn btn-secondary" id="save-schema-button" type="button">Save</button>
+                <button class="btn btn-outline-danger ml-2" id="delete-schema-button" type="button" disabled>Delete</button>
+              </div>
+              <small id="saved-schema-status" class="form-text text-muted" role="status" aria-live="polite"></small>
+            </div>
+            <div id="saved-schema-preview" class="table-responsive mt-3" aria-live="polite"></div>
+          </div>
+        </div>
+
         <!-- Column Names -->
         <div class="d-flex row-hl">
             <div class="col-0 text-white" >_____</div>   
@@ -19,17 +80,18 @@
             <div class="col-2" title="YOU HAVE CHOSEN A DATA FIELD, WHAT DATA TYPE WOULD YOU LIKE?">Data Type</div>
             <div class="col-4" title="DECIDE WHAT FORMAT YOU WANT THIS FIELD"> Format</div>
             <div class="col-1" title="CHOOSE % OF BLACKSPACES WITHIN YOUR DATA">Blank (%)</div>
-            <div class="col-1.5 px-4" title="CHOOSE % OF SPECIAL CHARACTERS WITHIN YOUR DATA">Special Characters</div>
+            <div class="col-3 px-4" title="CHOOSE % OF SPECIAL CHARACTERS WITHIN YOUR DATA">Special Characters</div>
         </div>
 
         <div class ="d-flex row-hl" id = "add">
             <button type="button" title="CLICK TO ADD DATA FIELDS" class="btn btn-secondary">+</button>
         </div>
+        </div>
 
         <!-- Submit Button -->
         <div class="row justify-content-center">
           <input type="number" class="form-control col-2" placeholder="No. of Records" name="num_of_entries" id="num_of_entries" min="1" required>
-          <div class="col-2">  
+          <div class="col-2" id="manual-file-type" data-manual-schema>
             <select class="custom-select" name="file_type">
               <option value="csv">CSV</option>
               <option value="json">JSON</option>
@@ -64,5 +126,7 @@
     <script src="{% static 'website/js/attr_list.js' %}"></script>
     <script src="{% static 'website/js/widgets.js' %}"></script>
     <script src="{% static 'website/js/submit.js' %}"></script>
+    <script src="{% static 'website/js/schema_mode.js' %}"></script>
+    <script src="{% static 'website/js/saved_schemas.js' %}"></script>
 
 {% endblock %}

@@ -29,6 +29,10 @@ In the command terminal:
 
 `python manage.py runserver`
 
+## Saved manual schemas
+
+On the home page, save a completed manual schema by entering a name and selecting **Save**. Saved schemas are stored in the current browser for this site, can be selected to preview their columns and load them back into the editor, and can be removed with **Delete**. They are not shared across browsers or app instances.
+
 ## 1.4 Stopping the application
 
 To stop running the application, press Ctrl+C in the command prompt
